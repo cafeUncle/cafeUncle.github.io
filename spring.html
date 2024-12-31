@@ -332,8 +332,8 @@
             document.body.appendChild(launchButton);
             
             // 设置初始文本
-            launchButton.setAttribute('data-text', '发射');
-            launchButton.style.setProperty('--text', '"发射"');
+            launchButton.setAttribute('data-text', '点燃');
+            launchButton.style.setProperty('--text', '"点燃"');
 
             let isCountingDown = false;
 
@@ -359,7 +359,7 @@
                     } else {
                         // 倒计时结束
                         clearInterval(countInterval);
-                        updateButtonText('发射');
+                        updateButtonText('点燃');
                         launchButton.classList.remove('counting');
                         isCountingDown = false;
                         
