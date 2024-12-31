@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>元旦快乐</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000810;
+            overflow: hidden;
+            min-height: 100vh;
+        }
+
+        .firework {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            animation: firework 3.2s ease-out forwards;
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+
+        .particle {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            animation: particle 2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            opacity: 0;
+            will-change: transform, opacity;
+            background: radial-gradient(circle, var(--color) 0%, transparent 100%);
+            border-radius: 50%;
+            box-shadow: 
+                0 0 10px 2px var(--color),
+                0 0 20px 4px var(--color),
+                0 0 30px 6px rgba(255, 255, 255, 0.4);
+        }
+
+        .trail {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 2px;
+            height: 2px;
+            border-radius: 50%;
+            animation: trail 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            opacity: 0;
+            will-change: transform, opacity;
+            background: radial-gradient(circle, var(--color) 0%, transparent 80%);
+            box-shadow: 
+                0 0 6px 2px var(--color),
+                0 0 12px 4px rgba(255, 255, 255, 0.3);
+        }
+
+        .particle::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 3px;
+            height: 20px;
+            background: linear-gradient(
+                to top,
+                transparent 0%,
+                var(--color) 50%,
+                rgba(255, 255, 255, 0.4) 100%
+            );
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            opacity: 0.6;
+            filter: blur(1px);
+        }
+
+        .trail::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 2px;
+            height: 15px;
+            background: linear-gradient(
+                to top,
+                transparent 0%,
+                var(--color) 50%,
+                rgba(255, 255, 255, 0.3) 100%
+            );
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            opacity: 0.4;
+            filter: blur(1px);
+        }
+
+        @keyframes firework {
+            0% {
+                transform: translate(var(--x), 100vh);
+                width: 5px;
+                height: 5px;
+                opacity: 1;
+                background-color: rgba(255, 255, 255, 0.8);
+            }
+            50% {
+                transform: translate(var(--x), var(--y));
+                width: 5px;
+                height: 5px;
+                opacity: 1;
+                background-color: var(--color);
+            }
+            60% {
+                width: 8px;
+                height: 8px;
+                opacity: 0.9;
+                background-color: transparent;
+            }
+            100% {
+                width: 0;
+                height: 0;
+                opacity: 0;
+                transform: translate(var(--x), var(--y));
+                background-color: transparent;
+            }
+        }
+
+        @keyframes particle {
+            0% {
+                transform: rotate(var(--angle)) translateY(0) scale(1);
+                opacity: 1;
+                filter: brightness(1.5);
+            }
+            30% {
+                opacity: 1;
+                filter: brightness(1.3);
+            }
+            60% {
+                opacity: 0.8;
+                transform: rotate(var(--angle)) translateY(80px) scale(0.8);
+                filter: brightness(1.2);
+            }
+            100% {
+                transform: rotate(var(--angle)) translateY(140px) scale(0);
+                opacity: 0;
+                filter: brightness(1);
+            }
+        }
+
+        @keyframes trail {
+            0% {
+                transform: rotate(var(--angle)) 
+                          translateY(var(--distance)) 
+                          scale(1);
+                opacity: 0.8;
+                filter: brightness(1.3);
+            }
+            60% {
+                opacity: 0.6;
+                filter: brightness(1.1);
+            }
+            100% {
+                transform: rotate(var(--angle)) 
+                          translateY(calc(var(--distance) + 80px)) 
+                          scale(0);
+                opacity: 0;
+                filter: brightness(1);
+            }
+        }
+
+        .moon {
+            position: fixed;
+            top: 60px;
+            right: 60px;
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle at 40% 40%,
+                rgba(255, 255, 255, 1) 0%,
+                rgba(255, 255, 255, 0.98) 30%,
+                rgba(255, 255, 255, 0.95) 50%,
+                rgba(255, 255, 255, 0.85) 70%,
+                transparent 100%);
+            border-radius: 50%;
+            box-shadow: 
+                0 0 30px 10px rgba(255, 255, 255, 0.4),
+                0 0 60px 20px rgba(255, 255, 255, 0.2),
+                0 0 100px 40px rgba(255, 255, 255, 0.1);
+            opacity: 0;
+            animation: moonAppear 2s ease-out forwards;
+            pointer-events: none;
+        }
+
+        .moon::before {
+            content: '';
+            position: absolute;
+            top: 25%;
+            left: 30%;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle,
+                rgba(220, 220, 220, 0.8) 0%,
+                rgba(255, 255, 255, 0) 70%);
+            border-radius: 50%;
+            transform: scale(0.8);
+        }
+
+        .moon::after {
+            content: '';
+            position: absolute;
+            top: 55%;
+            left: 45%;
+            width: 15px;
+            height: 15px;
+            background: radial-gradient(circle,
+                rgba(220, 220, 220, 0.6) 0%,
+                rgba(255, 255, 255, 0) 70%);
+            border-radius: 50%;
+            transform: scale(0.9);
+        }
+
+        @keyframes moonAppear {
+            0% {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 90% 10%,
+                rgba(255, 255, 255, 0.1) 0%,
+                rgba(255, 255, 255, 0.05) 20%,
+                transparent 60%);
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const moon = document.createElement('div');
+            moon.className = 'moon';
+            document.body.appendChild(moon);
+            
+            setInterval(() => {
+                moon.style.boxShadow = `
+                    0 0 ${30 + Math.random() * 5}px ${10 + Math.random() * 2}px rgba(255, 255, 255, 0.4),
+                    0 0 ${60 + Math.random() * 10}px ${20 + Math.random() * 3}px rgba(255, 255, 255, 0.2),
+                    0 0 ${100 + Math.random() * 15}px ${40 + Math.random() * 5}px rgba(255, 255, 255, 0.1)
+                `;
+            }, 3000);
+        });
+
+        function createTrails(particle, color) {
+            const trailCount = 5;
+            for (let i = 0; i < trailCount; i++) {
+                const trail = document.createElement('div');
+                trail.className = 'trail';
+                
+                const baseAngle = (i * 360 / trailCount);
+                const randomOffset = Math.random() * 15 - 7.5;
+                const angle = baseAngle + randomOffset;
+                const distance = 50 + Math.random() * 40;
+                
+                trail.style.setProperty('--angle', `${angle}deg`);
+                trail.style.setProperty('--distance', `${distance}px`);
+                trail.style.setProperty('--color', color);
+                
+                const glowColor = color.replace(')', ', 0.5)').replace('rgb', 'rgba');
+                trail.style.filter = `drop-shadow(0 0 6px ${glowColor})
+                                    blur(0.4px)`;
+                
+                trail.style.animationDelay = `${1.5 + Math.random() * 0.2}s`;
+                
+                particle.appendChild(trail);
+            }
+        }
+
+        function createParticles(firework, color) {
+            const particleCount = 24;
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                
+                const angle = (i * 360) / particleCount;
+                particle.style.setProperty('--angle', `${angle}deg`);
+                particle.style.setProperty('--color', color);
+                
+                const glowColor = color.replace(')', ', 0.7)').replace('rgb', 'rgba');
+                particle.style.filter = `drop-shadow(0 0 8px ${glowColor})
+                                       blur(0.6px)`;
+                
+                particle.style.animationDelay = `${1.5 + Math.random() * 0.2}s`;
+                
+                firework.appendChild(particle);
+                createTrails(particle, color);
+            }
+        }
+
+        function cleanupFireworks() {
+            const oldFireworks = document.querySelectorAll('.firework');
+            oldFireworks.forEach(firework => {
+                if (firework.getBoundingClientRect().bottom < 0) {
+                    firework.remove();
+                }
+            });
+        }
+
+        function createFirework(offsetX = 0, offsetY = 0) {
+            const firework = document.createElement('div');
+            firework.className = 'firework';
+            
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight * 0.25;
+            
+            const randomGaussian = () => {
+                let u = 0, v = 0;
+                while(u === 0) u = Math.random();
+                while(v === 0) v = Math.random();
+                return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+            };
+            
+            const spreadX = window.innerWidth * 0.3;
+            const spreadY = window.innerHeight * 0.15;
+            
+            const minHeight = window.innerHeight * 0.15;
+            let y = centerY + Math.abs(randomGaussian()) * spreadY + offsetY;
+            y = Math.min(y, window.innerHeight * 0.4);
+            y = Math.max(y, minHeight);
+            
+            const x = centerX + randomGaussian() * spreadX + offsetX;
+            
+            const colors = [
+                '#FFD700',  // 金色
+                '#FFA500',  // 橙色
+                '#FF4500',  // 红橙色
+                '#FF6347',  // 朱红色
+                '#FF8C00',  // 深橙色
+                '#FFB200',  // 琥珀金
+                '#FF4D4D',  // 鲜红色
+                '#FF9933',  // 暖橙色
+                '#FFCC00',  // 明黄色
+                '#FF7F50'   // 珊瑚红
+            ];
+            
+            const colorIndex = Math.random() < 0.6 ? 
+                Math.floor(Math.random() * 3) : 
+                Math.floor(Math.random() * colors.length);
+                
+            const color = colors[colorIndex];
+            
+            firework.style.setProperty('--x', `${x}px`);
+            firework.style.setProperty('--y', `${y}px`);
+            firework.style.setProperty('--color', color);
+            
+            document.body.appendChild(firework);
+            
+            requestAnimationFrame(() => {
+                createParticles(firework, color);
+            });
+            
+            firework.addEventListener('animationend', () => {
+                firework.remove();
+            });
+        }
+
+        function launchFirework() {
+            const count = Math.floor(Math.random() * 2) + 1;
+            
+            for(let i = 0; i < count; i++) {
+                setTimeout(() => {
+                    const offsetX = (Math.random() - 0.5) * 120;
+                    const offsetY = (Math.random() - 0.5) * 30;
+                    createFirework(offsetX, offsetY);
+                }, i * 100);
+            }
+            
+            setTimeout(launchFirework, Math.random() * 600 + 600);
+        }
+
+        let lastTime = 0;
+        function animate(currentTime) {
+            if (currentTime - lastTime >= 100) {
+                cleanupFireworks();
+                lastTime = currentTime;
+            }
+            requestAnimationFrame(animate);
+        }
+
+        requestAnimationFrame(animate);
+        requestAnimationFrame(() => {
+            launchFirework();
+            setTimeout(() => {
+                launchFirework();
+            }, 300);
+        });
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                const allFireworks = document.querySelectorAll('.firework');
+                allFireworks.forEach(firework => firework.remove());
+            }
+        });
+    </script>
+</body>
+</html> 
