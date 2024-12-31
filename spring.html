@@ -239,6 +239,76 @@
                 transparent 70%);
             pointer-events: none;
         }
+
+        /* 发射按钮样式 */
+        .launch-button {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 40% 40%,
+                rgba(255, 60, 60, 0.8) 0%,
+                rgba(255, 40, 40, 0.9) 50%,
+                rgba(200, 30, 30, 1) 100%);
+            border: none;
+            cursor: pointer;
+            box-shadow: 
+                0 0 15px rgba(255, 60, 60, 0.4),
+                0 0 30px rgba(255, 60, 60, 0.2),
+                inset 0 0 15px rgba(255, 255, 255, 0.3);
+            transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+            z-index: 1000;
+        }
+
+        /* 倒计时数字样式 */
+        .launch-button.counting {
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+
+        .launch-button.counting::before {
+            font-size: 2em;
+            animation: countScale 1s infinite;
+        }
+
+        @keyframes countScale {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.2);
+            }
+        }
+
+        .launch-button::before {
+            content: attr(data-text);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .launch-button:hover {
+            transform: scale(1.05);
+            box-shadow: 
+                0 0 20px rgba(255, 60, 60, 0.6),
+                0 0 40px rgba(255, 60, 60, 0.3),
+                inset 0 0 20px rgba(255, 255, 255, 0.4);
+        }
+
+        .launch-button:active {
+            transform: scale(0.95);
+            box-shadow: 
+                0 0 10px rgba(255, 60, 60, 0.3),
+                0 0 20px rgba(255, 60, 60, 0.1),
+                inset 0 0 10px rgba(255, 255, 255, 0.2);
+        }
     </style>
 </head>
 <body>
@@ -255,6 +325,96 @@
                     0 0 ${200 + Math.random() * 30}px ${80 + Math.random() * 10}px rgba(255, 255, 255, 0.1)
                 `;
             }, 3000);
+
+            // 创建发射按钮
+            const launchButton = document.createElement('button');
+            launchButton.className = 'launch-button';
+            document.body.appendChild(launchButton);
+            
+            // 设置初始文本
+            launchButton.setAttribute('data-text', '发射');
+            launchButton.style.setProperty('--text', '"发射"');
+
+            let isCountingDown = false;
+
+            function updateButtonText(text) {
+                launchButton.setAttribute('data-text', text);
+                launchButton.style.setProperty('--text', `"${text}"`);
+            }
+
+            function startCountdown() {
+                if (isCountingDown) return;
+                
+                isCountingDown = true;
+                launchButton.classList.add('counting');
+                let count = 3;
+
+                // 立即更新显示
+                updateButtonText(count.toString());
+
+                const countInterval = setInterval(() => {
+                    count--;
+                    if (count > 0) {
+                        updateButtonText(count.toString());
+                    } else {
+                        // 倒计时结束
+                        clearInterval(countInterval);
+                        updateButtonText('发射');
+                        launchButton.classList.remove('counting');
+                        isCountingDown = false;
+                        
+                        // 发射烟花
+                        const count = Math.floor(Math.random() * 2) + 2;
+                        for(let i = 0; i < count; i++) {
+                            setTimeout(() => {
+                                const centerX = window.innerWidth / 2;
+                                const spreadX = window.innerWidth * 0.2;
+                                const randomX = centerX + (Math.random() - 0.5) * spreadX;
+                                
+                                const x = Math.max(window.innerWidth * 0.2, 
+                                                Math.min(window.innerWidth * 0.8, randomX));
+                                
+                                createFirework(
+                                    x - window.innerWidth / 2,
+                                    (Math.random() - 0.5) * 20
+                                );
+                            }, i * 100);
+                        }
+                    }
+                }, 1000);
+            }
+
+            // 点击事件
+            launchButton.addEventListener('click', (e) => {
+                if (!isCountingDown) {
+                    startCountdown();
+                }
+            });
+
+            // 触摸事件
+            launchButton.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                if (!isCountingDown) {
+                    startCountdown();
+                }
+            });
+
+            // 添加自定义属性来控制文本显示
+            const style = document.createElement('style');
+            style.textContent = `
+                .launch-button::before {
+                    content: attr(data-text);
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    color: white;
+                    font-size: 1.2em;
+                    font-weight: bold;
+                    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+                }
+            `;
+            document.head.appendChild(style);
         });
 
         function createTrails(particle, color) {
