@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>元旦快乐</title>
+    <title>元旦烟花</title>
     <style>
         body {
             margin: 0;
@@ -166,10 +166,10 @@
 
         .moon {
             position: fixed;
-            top: 60px;
-            right: 60px;
-            width: 80px;
-            height: 80px;
+            top: 80px;
+            right: 80px;
+            width: 240px;
+            height: 240px;
             background: radial-gradient(circle at 40% 40%,
                 rgba(255, 255, 255, 1) 0%,
                 rgba(255, 255, 255, 0.98) 30%,
@@ -178,9 +178,9 @@
                 transparent 100%);
             border-radius: 50%;
             box-shadow: 
-                0 0 30px 10px rgba(255, 255, 255, 0.4),
-                0 0 60px 20px rgba(255, 255, 255, 0.2),
-                0 0 100px 40px rgba(255, 255, 255, 0.1);
+                0 0 60px 20px rgba(255, 255, 255, 0.4),
+                0 0 120px 40px rgba(255, 255, 255, 0.2),
+                0 0 200px 80px rgba(255, 255, 255, 0.1);
             opacity: 0;
             animation: moonAppear 2s ease-out forwards;
             pointer-events: none;
@@ -191,8 +191,8 @@
             position: absolute;
             top: 25%;
             left: 30%;
-            width: 20px;
-            height: 20px;
+            width: 60px;
+            height: 60px;
             background: radial-gradient(circle,
                 rgba(220, 220, 220, 0.8) 0%,
                 rgba(255, 255, 255, 0) 70%);
@@ -205,8 +205,8 @@
             position: absolute;
             top: 55%;
             left: 45%;
-            width: 15px;
-            height: 15px;
+            width: 45px;
+            height: 45px;
             background: radial-gradient(circle,
                 rgba(220, 220, 220, 0.6) 0%,
                 rgba(255, 255, 255, 0) 70%);
@@ -233,9 +233,10 @@
             width: 100%;
             height: 100%;
             background: radial-gradient(circle at 90% 10%,
-                rgba(255, 255, 255, 0.1) 0%,
-                rgba(255, 255, 255, 0.05) 20%,
-                transparent 60%);
+                rgba(255, 255, 255, 0.12) 0%,
+                rgba(255, 255, 255, 0.08) 20%,
+                rgba(255, 255, 255, 0.02) 40%,
+                transparent 70%);
             pointer-events: none;
         }
     </style>
@@ -249,9 +250,9 @@
             
             setInterval(() => {
                 moon.style.boxShadow = `
-                    0 0 ${30 + Math.random() * 5}px ${10 + Math.random() * 2}px rgba(255, 255, 255, 0.4),
-                    0 0 ${60 + Math.random() * 10}px ${20 + Math.random() * 3}px rgba(255, 255, 255, 0.2),
-                    0 0 ${100 + Math.random() * 15}px ${40 + Math.random() * 5}px rgba(255, 255, 255, 0.1)
+                    0 0 ${60 + Math.random() * 10}px ${20 + Math.random() * 4}px rgba(255, 255, 255, 0.4),
+                    0 0 ${120 + Math.random() * 20}px ${40 + Math.random() * 6}px rgba(255, 255, 255, 0.2),
+                    0 0 ${200 + Math.random() * 30}px ${80 + Math.random() * 10}px rgba(255, 255, 255, 0.1)
                 `;
             }, 3000);
         });
@@ -305,7 +306,8 @@
         function cleanupFireworks() {
             const oldFireworks = document.querySelectorAll('.firework');
             oldFireworks.forEach(firework => {
-                if (firework.getBoundingClientRect().bottom < 0) {
+                const rect = firework.getBoundingClientRect();
+                if (rect.bottom < 0 || rect.opacity === 0) {
                     firework.remove();
                 }
             });
@@ -325,15 +327,19 @@
                 return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
             };
             
-            const spreadX = window.innerWidth * 0.3;
+            const spreadX = window.innerWidth * 0.2;
             const spreadY = window.innerHeight * 0.15;
+            
+            const minX = window.innerWidth * 0.2;
+            const maxX = window.innerWidth * 0.8;
+            
+            let x = centerX + randomGaussian() * spreadX + offsetX;
+            x = Math.max(minX, Math.min(maxX, x));
             
             const minHeight = window.innerHeight * 0.15;
             let y = centerY + Math.abs(randomGaussian()) * spreadY + offsetY;
             y = Math.min(y, window.innerHeight * 0.4);
             y = Math.max(y, minHeight);
-            
-            const x = centerX + randomGaussian() * spreadX + offsetX;
             
             const colors = [
                 '#FFD700',  // 金色
@@ -370,34 +376,33 @@
         }
 
         function launchFirework() {
-            const count = Math.floor(Math.random() * 2) + 1;
+            const count = Math.random() < 0.3 ? 1 : 0;
             
-            for(let i = 0; i < count; i++) {
+            if (count > 0) {
                 setTimeout(() => {
-                    const offsetX = (Math.random() - 0.5) * 120;
-                    const offsetY = (Math.random() - 0.5) * 30;
+                    const offsetX = (Math.random() - 0.5) * 80;
+                    const offsetY = (Math.random() - 0.5) * 20;
                     createFirework(offsetX, offsetY);
-                }, i * 100);
+                }, 0);
             }
             
-            setTimeout(launchFirework, Math.random() * 600 + 600);
+            setTimeout(launchFirework, Math.random() * 800 + 800);
         }
 
-        let lastTime = 0;
+        let lastCleanup = 0;
         function animate(currentTime) {
-            if (currentTime - lastTime >= 100) {
+            if (currentTime - lastCleanup >= 2000) {
                 cleanupFireworks();
-                lastTime = currentTime;
+                lastCleanup = currentTime;
             }
             requestAnimationFrame(animate);
         }
 
-        requestAnimationFrame(animate);
         requestAnimationFrame(() => {
             launchFirework();
             setTimeout(() => {
                 launchFirework();
-            }, 300);
+            }, 500);
         });
 
         document.addEventListener('visibilitychange', () => {
